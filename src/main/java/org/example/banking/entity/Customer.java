@@ -1,9 +1,6 @@
 package org.example.banking.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Customer {
@@ -13,13 +10,13 @@ public class Customer {
 
         private String firstName;
         private String lastName;
+        @Column(unique = true)
         private   String email;
         private   String phoneNumber;
 
         public Customer(){}
 
         public Customer(Long id, String firstName, String lastName, String email, String phoneNumber) {
-        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

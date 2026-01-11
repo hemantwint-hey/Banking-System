@@ -1,8 +1,11 @@
 package org.example.banking.services;
 
+import org.apache.coyote.Response;
 import org.example.banking.entity.Customer;
 import org.example.banking.repository.CustomerRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 @Service
@@ -21,24 +24,33 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Customer getCustomerId(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Customer not found"));
     }
 
     @Override
     public Customer updateCustomer(Long id, Customer customer) {
-            Customer existingCustomer=getCustomerId(id);
-            existingCustomer.setFirstName(customer.getFirstName());
-            existingCustomer.setLastName(customer.getLastName());
-            existingCustomer.setEmail(customer.getEmail());
-            existingCustomer.setId(customer.getId());
 
-            return repository.save(existingCustomer);
+        Customer existingCustomer = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found")
+                );
 
+        existingCustomer.setFirstName(customer.getFirstName());
+        existingCustomer.setLastName(customer.getLastName());
+        existingCustomer.setEmail(customer.getEmail());
+        existingCustomer.setPhoneNumber(customer.getPhoneNumber());
+
+        return repository.save(existingCustomer);
     }
 
+
     @Override
-    public void deleteCustomer(Long id) {
+    public String deleteCustomer(Long id) {
+        Customer existingCustomer=repository.findById(id)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Customer not found")
+                );
         repository.deleteById(id);
+        return "Customer deleted successfully";
     }
 
     @Override
